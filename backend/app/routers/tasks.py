@@ -25,16 +25,16 @@ def display_task(status: str | None = None,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    query = db.query(models.Task).filter(current_user.id == models.Task.user_id)
+    query = db.query(models.Task).filter(models.Task.user_id == current_user.id)
     if status == "pending":
-        query = db.query(models.Task).filter(models.Task.completed == False)
+        query = query.filter(models.Task.completed == False)
     elif status=="completed":
-        query = db.query(models.Task).filter(models.Task.completed == True)
+        query = query.filter(models.Task.completed == True)
         
     if category:
-        query = db.query(models.Task).filter(models.Task.category== category)
+        query = query.filter(models.Task.category == category)
     if priority is not None:
-        query = db.query(models.Task).filter(models.Task.priority == priority)
+        query = query.filter(models.Task.priority == priority)
     if search:
         like = f"%{search}%"
         query = query.filter(or_(models.Task.title.ilike(like), models.Task.description.ilike(like)))
