@@ -8,7 +8,7 @@ from uuid import UUID
 class TaskBase(BaseModel):
     title: str
     description: Optional[str] = ""
-    priority: Optional[str] = "medium"
+    priority: Optional[int] = Field(default=2, ge=1, le=3)
     category: Optional[str] = "academic"
     due_date: Optional[date] = None
     completed: Optional[bool] = False
@@ -19,7 +19,7 @@ class TaskCreate(TaskBase):
 class TaskUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
-    priority: Optional[str] = None
+    priority: Optional[int] = None
     category: Optional[str] = None
     due_date: Optional[date] = None
     completed: Optional[bool] = None

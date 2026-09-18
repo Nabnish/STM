@@ -7,10 +7,25 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from uuid import UUID
 from .auth import hash_password, verify_password, create_access_token, get_current_user, get_db
+from .routers import tasks
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
 
+
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+app.include_router(tasks.router)
 
 @app.get("/health")
 def root():
