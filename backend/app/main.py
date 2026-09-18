@@ -1,13 +1,16 @@
 from fastapi import FastAPI
 from sqlalchemy import text
-import models, schemas
-from database import engine, SessionLocal, Base
+from . import models, schemas
+from .database import engine, SessionLocal, Base
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
+from uuid import UUID
+from .auth import hash_password, verify_password, create_access_token, get_current_user, get_db
 
 
-app = FastAPI();
+app = FastAPI()
+
 
 @app.get("/health")
 def root():
@@ -21,9 +24,32 @@ def test():
             return{"message":"databse connected"}
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db 
-    finally:
-        db.close()
+
+
+@app.post("/api/auth/register", response_model=schemas.UserOut, status_code=201)
+def resgister(user: schemas.UserCreate,db: Session = Depends(get_db)):
+    exsisting = db.query(models.User).filter(models.User.email == user.email ).first()
+    if exsisting:
+        raise HTTPException(400, "Already exsisting")
+    db_user = models.User(
+        name=user.name,
+        email=user.email,
+        password_hash=hash_password(user.password),
+    )
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+@app.post("/api/auth/login")
+def login(credentials: schemas.UserLogin, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.email == credentials.email).first()
+    if not user or not verify_password(credentials.password, user.password_hash):
+        raise HTTPException(401, "Invalid email or password")
+    token = create_access_token({"sub": str(user.id)})
+    return {"access_token": token, "token_type": "bearer"}
+
+@app.get("/api/auth/me", response_model=schemas.UserOut)
+def me(current_user: models.User = Depends(get_current_user)):
+    return current_user
+    

@@ -1,11 +1,13 @@
 from sqlalchemy import Column, Integer, String, Text, Boolean, Date, DateTime, ForeignKey, func
 from sqlalchemy.orm import relationship
-from database import Base
+from .database import Base
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(100), nullable=False)
     email = Column(String(150), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
@@ -17,11 +19,11 @@ class User(Base):
 class Task(Base):
     __tablename__ = "tasks"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     title = Column(String(200), nullable=False)
     description = Column(Text, default="")
-    priority = Column(Integer, default=2)  # 1 = high, 2 = medium, 3 = low
+    priority = Column(Integer, default=2)  
     category = Column(String(20), default="academic")
     due_date = Column(Date, nullable=True)
     completed = Column(Boolean, default=False)
