@@ -107,6 +107,17 @@ The backend will run on:
 http://localhost:8000
 ```
 
+### Deploying the backend to Vercel
+
+Set the Vercel project Root Directory to `backend`. Add these Environment Variables to the Vercel project before redeploying:
+
+```env
+DATABASE_URL=postgresql://user:password@host:5432/database?sslmode=require
+SECRET_KEY=replace-with-a-long-random-production-secret
+```
+
+`DATABASE_URL` must point to a hosted PostgreSQL database. A local `localhost` database URL only works during local development and will cause a Vercel Function Invocation Error.
+
 API documentation:
 
 ```text
