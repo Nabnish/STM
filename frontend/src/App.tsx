@@ -12,7 +12,7 @@ type DueFilter = 'all' | 'overdue' | 'today' | 'scheduled' | 'none'
 type SortMode = 'priority' | 'newest' | 'due'
 type ApiRequest = <T>(path: string, options?: RequestInit) => Promise<T>
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '')
 const themes: Theme[] = ['acid', 'paper', 'signal']
 const builtInCategories = ['academic', 'personal', 'work', 'health']
 type IconProps = { size?: number; className?: string; strokeWidth?: number }
